@@ -100,6 +100,7 @@ export function getManyEmploye(req, res) {
     .exec()
     .then((employes) => {
       const data = employes.map((obj) => ({
+        id: obj._id,
         nom:
           obj.employeId.nom.charAt(0).toUpperCase() +
           obj.employeId.nom.slice(1),
@@ -132,6 +133,7 @@ export async function getManyCompetence(req, res) {
       .exec();
 
     const data = competences.map((obj) => ({
+      id: obj._id,
       nom:
         obj.employeId.nom.charAt(0).toUpperCase() + obj.employeId.nom.slice(1),
       prenom:
@@ -225,5 +227,14 @@ export async function filtreByPays(req, res) {
     res.status(200).json(dataFinal);
   } catch (error) {
     res.status(500).json({ error: error });
+  }
+}
+
+export async function deleteOnce(req,res){
+  try {
+    const affect = await CompetenceEmploye.findByIdAndDelete({_id : req.params.id});
+    res.status(200).json({message : "Affectation has been deleted successfully"})
+  }catch(error){
+    res.status(500).json({error : error})
   }
 }

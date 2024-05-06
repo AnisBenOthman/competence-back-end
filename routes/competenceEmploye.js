@@ -8,6 +8,7 @@ import {
   getManyCompetence,
   filtreByCompetence,
   filtreByPays,
+  deleteOnce,
 } from "../controllers/competenceEmploye.js";
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router
   .post(body("niveau").isInt({ max: 3 }), addOnce);
 
 router.route("/employe/:employeId").put(updateOne).get(getManyEmploye);
+router.route("/:id").delete(deleteOnce);
 
 router.route("/competence/:competenceId").get(getManyCompetence);
 router.route("/filtre/:competenceId").get(filtreByCompetence);
