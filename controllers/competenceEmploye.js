@@ -24,14 +24,14 @@ export async function addOnce(req, res, next) {
       res
         .status(200)
         .json({ error: "competence deja affecté à cette personne" });
-    } else
-      res.json(
-        await CompetenceEmploye.create({
-          niveau: req.body.niveau,
-          employeId: req.params.employeId,
-          competenceId: req.params.competenceId,
-        })
-      );
+    } else {
+      const newCompetenceEmploye = await CompetenceEmploye.create({
+        niveau: req.body.niveau,
+        employeId: req.params.employeId,
+        competenceId: req.params.competenceId,
+      });
+      res.json({ competence: competence.libelle, data: newCompetenceEmploye });
+    }
   } catch (error) {
     next(error);
   }
@@ -43,23 +43,38 @@ export async function getAll(req, res) {
       .populate("employeId")
       .populate("competenceId")
       .exec();
-
-    // const data = listObject.map((obj) => ({
-    //   nom:
-    //     obj.employeId.nom.charAt(0).toUpperCase() + obj.employeId.nom.slice(1),
-    //   prenom:
-    //     obj.employeId.prenom.charAt(0).toUpperCase() +
-    //     obj.employeId.prenom.slice(1),
-    //   pays:
-    //     obj.employeId.pays.charAt(0).toUpperCase() +
-    //     obj.employeId.pays.slice(1),
-    //   competence:
-    //     obj.competenceId.libelle.charAt(0).toUpperCase() +
-    //     obj.competenceId.libelle.slice(1),
-    //   niveau: obj.niveau,
-    // }));
-
     res.status(200).json(listObject);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+export async function getTeam(req, res) {
+  try {
+    const listObject = await CompetenceEmploye.find()
+      .populate("employeId")
+      .populate("competenceId")
+      .exec();
+
+    const teamList = [];
+    let membres = 1;
+    for (let i = 0; i < listObject.length; i++) {
+      let competence = listObject[i].competenceId.libelle;
+      let niveau = listObject[i].niveau;
+      if (!teamList.some((x) => x.competence == competence)) {
+        teamList.push({
+          competence: competence,
+          niveau: niveau,
+          membres: membres,
+        });
+      } else {
+        let index = teamList.findIndex((x) => x.competence == competence);
+        teamList[index].niveau += niveau;
+        teamList[index].membres++;
+      }
+    }
+
+    res.status(200).json(teamList);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -155,8 +170,19 @@ export async function getManyCompetence(req, res) {
 
 export function updateOne(req, res) {
   competenceEmploye
-    .findByIdAndUpdate(
-      { _id: req.params.affectationId },
+    .findByIdAndUpdate({ _id: req.params.id }, { niveau: req.body.niveau })
+    .then((affectation) => {
+      res.status(200).json({ message: "Update Successful", affectation });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error });
+    });
+}
+
+export function updateEmploye(req, res) {
+  competenceEmploye
+    .findOneAndUpdate(
+      { employeId: req.params.employeId },
       { niveau: req.body.niveau }
     )
     .then((affectation) => {
@@ -230,11 +256,15 @@ export async function filtreByPays(req, res) {
   }
 }
 
-export async function deleteOnce(req,res){
+export async function deleteOnce(req, res) {
   try {
-    const affect = await CompetenceEmploye.findByIdAndDelete({_id : req.params.id});
-    res.status(200).json({message : "Affectation has been deleted successfully"})
-  }catch(error){
-    res.status(500).json({error : error})
+    const affect = await CompetenceEmploye.findByIdAndDelete({
+      _id: req.params.id,
+    });
+    res.status(200).json({
+      message: `has been deleted successfully`,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error });
   }
 }

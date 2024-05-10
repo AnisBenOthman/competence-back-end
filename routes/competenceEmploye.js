@@ -9,17 +9,20 @@ import {
   filtreByCompetence,
   filtreByPays,
   deleteOnce,
+  updateEmploye,
+  getTeam,
 } from "../controllers/competenceEmploye.js";
 const router = express.Router();
 
 router.route("/").get(getAll);
+router.route("/getTeam").get(getTeam);
 
 router
   .route("/:employeId/:competenceId")
   .post(body("niveau").isInt({ max: 3 }), addOnce);
 
-router.route("/employe/:employeId").put(updateOne).get(getManyEmploye);
-router.route("/:id").delete(deleteOnce);
+router.route("/employe/:employeId").get(getManyEmploye).put(updateEmploye);
+router.route("/:id").delete(deleteOnce).put(updateOne);
 
 router.route("/competence/:competenceId").get(getManyCompetence);
 router.route("/filtre/:competenceId").get(filtreByCompetence);
