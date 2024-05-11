@@ -71,10 +71,18 @@ export async function getTeam(req, res) {
         let index = teamList.findIndex((x) => x.competence == competence);
         teamList[index].niveau += niveau;
         teamList[index].membres++;
+        // teamList[index].moyenne =
+        //   (teamList[index].niveau += niveau) / teamList[index].membres++;
       }
     }
+    const data = teamList.map((o) => ({
+      competence: o.competence,
+      membres: o.membres,
+      niveau: o.niveau,
+      moyenne: o.niveau / o.membres,
+    }));
 
-    res.status(200).json(teamList);
+    res.status(200).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
