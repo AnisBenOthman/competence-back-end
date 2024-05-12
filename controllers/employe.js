@@ -123,6 +123,32 @@ export function getMany(req, res) {
     });
 }
 
+export async function getPays(req, res) {
+  try {
+    const pays = [];
+    const employes = await Employe.find({});
+    employes.map((o) => {
+      if (!pays.some((x) => x == o.pays.toLowerCase())) {
+        pays.push(o.pays);
+      }
+    });
+
+    res.status(200).json(pays);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
+export async function getEmployeByPays(req, res) {
+  try {
+    const employes = await Employe.find({ pays: { $in: req.body.pays } });
+
+    res.status(200).json(employes);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
 export function updateOne(req, res) {
   Employe.findByIdAndUpdate({ _id: req.params.employeId }, req.body)
     .then((employee) => {
