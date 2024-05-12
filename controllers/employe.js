@@ -103,7 +103,12 @@ export function getOnce(req, res) {
 }
 
 export function getMany(req, res) {
-  Employe.find({ nom: req.params.nom.toLowerCase() })
+  Employe.find({
+    $or: [
+      { nom: { $regex: req.params.nom, $options: "i" } },
+      { prenom: { $regex: req.params.nom, $options: "i" } },
+    ],
+  })
     .then((employes) => {
       const data = employes.map((o) => ({
         id: o.id,
