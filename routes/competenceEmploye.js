@@ -11,6 +11,8 @@ import {
   deleteOnce,
   updateEmploye,
   getTeam,
+  getCompetences,
+  getTeamPays,
 } from "../controllers/competenceEmploye.js";
 const router = express.Router();
 
@@ -25,10 +27,12 @@ router.route("/employe/:employeId").get(getManyEmploye).put(updateEmploye);
 router.route("/:id").delete(deleteOnce).put(updateOne);
 
 router.route("/competence/:competenceId").get(getManyCompetence);
+router.route("/competences/").get(getCompetences);
+router.route("/competencespays/:pays").get(getTeamPays);
 router.route("/filtre/:competenceId").get(filtreByCompetence);
 
 router.route("/update/:affectationId").patch(updateOne);
-router.route("/pays/:pays").get(filtreByPays);
+router.route("/pays").post(filtreByPays);
 
 router.use((err, req, res, next) => {
   if (err) res.status(500).json({ error: true, message: err?.message, err });

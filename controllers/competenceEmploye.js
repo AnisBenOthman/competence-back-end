@@ -88,6 +88,66 @@ export async function getTeam(req, res) {
   }
 }
 
+export async function getTeamPays(req, res) {
+  try {
+    const listObject = await CompetenceEmploye.find()
+      .populate("employeId")
+      .populate("competenceId")
+      .exec();
+    const pays = req.params.pays.toLowerCase();
+    const team = listObject.filter((o) => o.employeId.pays == pays);
+
+    const teamList = [];
+    let membres = 1;
+    for (let i = 0; i < team.length; i++) {
+      let competence = team[i].competenceId.libelle;
+      let niveau = team[i].niveau;
+      if (!teamList.some((x) => x.competence == competence)) {
+        teamList.push({
+          competence: competence,
+          niveau: niveau,
+          membres: membres,
+        });
+      } else {
+        let index = teamList.findIndex((x) => x.competence == competence);
+        teamList[index].niveau += niveau;
+        teamList[index].membres++;
+      }
+    }
+    const data = teamList.map((o) => ({
+      competence: o.competence,
+      membres: o.membres,
+      niveau: o.niveau,
+      moyenne: o.niveau / o.membres,
+    }));
+
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+export async function getCompetences(req, res) {
+  try {
+    const listObject = await CompetenceEmploye.find()
+      .populate("employeId")
+      .populate("competenceId")
+      .exec();
+
+    const teamList = [];
+    for (let i = 0; i < listObject.length; i++) {
+      let competence = listObject[i].competenceId.libelle;
+      if (!teamList.some((x) => x == competence)) {
+        teamList.push(competence);
+      }
+    }
+
+    res.status(200).json(teamList);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
 export async function getAllCompetenceEmploye() {
   try {
     const listObject = await CompetenceEmploye.find()
@@ -233,7 +293,7 @@ export async function filtreByCompetence(req, res) {
 export async function filtreByPays(req, res) {
   try {
     const listePays = await Employe.find({
-      pays: req.params.pays.toLowerCase(),
+      pays: { $in: req.body.pays },
     });
     const data = [];
     listePays.map((o) => data.push(o._id));
