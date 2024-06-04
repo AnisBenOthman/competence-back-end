@@ -6,12 +6,13 @@ import {
   getOnce,
   getMany,
   updateOne,
+  deleteOne,
 } from "../controllers/competence.js";
 const router = express.Router();
 
 router.route("/").get(getAll).post(addOnce);
 
-router.route("/id/:competenceId").get(getOnce).patch(updateOne);
+router.route("/id/:competenceId").get(getOnce).put(updateOne).delete(deleteOne);
 
 router.route("/:libelle").get(getMany);
 

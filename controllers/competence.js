@@ -87,3 +87,16 @@ export function updateOne(req, res) {
       res.status(500).json({ error: err });
     });
 }
+
+export async function deleteOne(req, res) {
+  try {
+    const competence = await Competence.findByIdAndDelete({
+      _id: req.params.competenceId,
+    });
+    res
+      .status(200)
+      .json({ message: "Delete Successful", competence: competence });
+  } catch (e) {
+    res.status(500).json({ error: e });
+  }
+}

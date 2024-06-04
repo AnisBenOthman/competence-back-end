@@ -143,7 +143,13 @@ export async function getEmployeByPays(req, res) {
   try {
     const employes = await Employe.find({ pays: { $in: req.body.pays } });
 
-    res.status(200).json(employes);
+    const data = employes.map((o) => ({
+      id: o.id,
+      nom: o.nom.charAt(0).toUpperCase() + o.nom.slice(1),
+      prenom: o.prenom.toUpperCase(),
+      pays: o.pays.charAt(0).toUpperCase() + o.pays.slice(1),
+    }));
+    res.status(200).json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -156,7 +162,7 @@ export function updateOne(req, res) {
         Message: "update successfuly",
         nom: req.body.nom,
         prenom: req.body.prenom,
-        pays: req.body.pays,
+        pays: req.body.pays.toLowerCase(),
       });
     })
     .catch((err) => {

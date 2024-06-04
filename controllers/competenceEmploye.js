@@ -236,15 +236,18 @@ export async function getManyCompetence(req, res) {
   }
 }
 
-export function updateOne(req, res) {
-  competenceEmploye
-    .findByIdAndUpdate({ _id: req.params.id }, { niveau: req.body.niveau })
-    .then((affectation) => {
-      res.status(200).json({ message: "Update Successful", affectation });
-    })
-    .catch((error) => {
-      res.status(500).json({ error: error });
-    });
+export async function updateOne(req, res) {
+  try {
+    const employe = await competenceEmploye
+      .findByIdAndUpdate({ _id: req.params.id }, { niveau: req.body.niveau })
+      .populate("employeId")
+      .populate("competenceId")
+      .exec();
+
+    res.status(200).json({ message: "Update Successful", employe });
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
 }
 
 export function updateEmploye(req, res) {
