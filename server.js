@@ -12,6 +12,7 @@ import { notFoundError, errorHandler } from "./middlewares/error-handler.js";
 import competenceRoutes from "./routes/competence.js";
 import employeRoutes from "./routes/employe.js";
 import competenceEmployeRoutes from "./routes/competenceEmploye.js";
+import kpiRoutes from "./routes/kpi.js";
 
 const app = express();
 const port = process.env.PORT || 9090;
@@ -37,6 +38,7 @@ app.use("/competence", competenceRoutes);
 app.use("/employe", employeRoutes);
 
 app.use("/competenceEmploye", competenceEmployeRoutes);
+app.use("/kpi", kpiRoutes);
 
 app.use(notFoundError);
 app.use(errorHandler);
